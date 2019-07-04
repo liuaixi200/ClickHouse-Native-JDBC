@@ -133,4 +133,8 @@ public class SQLLexer {
         }
         throw new SQLException("The String Literal is no Closed.");
     }
+
+    public String toString(){
+        return new String(data);
+    }
 }

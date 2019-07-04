@@ -1,15 +1,7 @@
 package com.github.housepower.jdbc.data;
 
 import com.github.housepower.jdbc.connect.PhysicalInfo;
-import com.github.housepower.jdbc.data.type.DataTypeDate;
-import com.github.housepower.jdbc.data.type.DataTypeFloat32;
-import com.github.housepower.jdbc.data.type.DataTypeFloat64;
-import com.github.housepower.jdbc.data.type.DataTypeInt16;
-import com.github.housepower.jdbc.data.type.DataTypeInt32;
-import com.github.housepower.jdbc.data.type.DataTypeInt64;
-import com.github.housepower.jdbc.data.type.DataTypeInt8;
-import com.github.housepower.jdbc.data.type.DataTypeString;
-import com.github.housepower.jdbc.data.type.DataTypeUUID;
+import com.github.housepower.jdbc.data.type.*;
 import com.github.housepower.jdbc.data.type.complex.DataTypeArray;
 import com.github.housepower.jdbc.data.type.complex.DataTypeDateTime;
 import com.github.housepower.jdbc.data.type.complex.DataTypeEnum16;
@@ -56,7 +48,10 @@ public class DataTypeFactory {
             return DataTypeNullable.createNullableType(lexer, serverInfo);
         } else if (dataTypeName.equals("FixedString")) {
             return DataTypeFixedString.createFixedStringType(lexer, serverInfo);
-        } else {
+        } else if(dataTypeName.toString().startsWith("Decimal")){
+            return DataTypeDecimal.createDecimalType(lexer,serverInfo);
+        }
+        else {
             String name = String.valueOf(dataTypeName);
             IDataType dataType = dataTypes.get(name);
             Validate.isTrue(dataType != null, "Unknown data type family:" + name);

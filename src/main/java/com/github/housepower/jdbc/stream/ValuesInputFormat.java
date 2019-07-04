@@ -23,9 +23,10 @@ public class ValuesInputFormat implements InputFormat {
             char nextChar = lexer.character();
             if (lexer.eof() || nextChar == ';')
                 return newValuesBlock(header, row, columnData);
-
-            if (row > 0 && nextChar == ',')
+            //去掉 gt0的限制
+            if (nextChar == ',') {
                 nextChar = lexer.character();
+            }
             Validate.isTrue(nextChar == '(');
             for (int column = 0; column < header.columns(); column++) {
                 if (column > 0)
