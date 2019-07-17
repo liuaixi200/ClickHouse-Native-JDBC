@@ -12,6 +12,7 @@ import com.github.housepower.jdbc.serializer.BinarySerializer;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.nio.ByteOrder;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -71,10 +72,11 @@ public class DataTypeDecimal implements IDataType {
         if (data instanceof StringView) {
             String ss = data.toString();
             BigDecimal bigDecimal = new BigDecimal(ss);
-            bigDecimal.movePointRight(scale);
+            bigDecimal = bigDecimal.movePointRight(scale);
             BigInteger bigInteger = bigDecimal.unscaledValue();
             byte[] bs2 = new byte[size];
-            Arrays.fill(bs2,(byte)0);
+            boolean isNegative = bigInteger.intValue()<0;
+            Arrays.fill(bs2,isNegative ? (byte)-1 : (byte)0);
             byte[] bs = bigInteger.toByteArray();
             if(bs.length > size){
                 throw new SQLException(String.format("this value %s is too big",ss));
@@ -84,8 +86,26 @@ public class DataTypeDecimal implements IDataType {
                 bs2[i]=bs[length-i-1];
             }
             serializer.writeBytes(bs2);
-        } else {
-            throw new SQLException("Expected String Parameter, but was " + data.getClass().getSimpleName());
+        } else if(data instanceof BigDecimal){
+            BigDecimal bigDecimal = (BigDecimal)data;
+            bigDecimal = bigDecimal.movePointRight(scale);
+            BigInteger bigInteger = bigDecimal.unscaledValue();
+            byte[] bs2 = new byte[size];
+            //负数用-1填充
+            boolean isNegative = bigInteger.intValue()<0;
+            Arrays.fill(bs2,isNegative ? (byte)-1 : (byte)0);
+
+            byte[] bs = bigInteger.toByteArray();
+            if(bs.length > size){
+                throw new SQLException(String.format("this value %s is too big",data.toString()));
+            }
+            int length = bs.length;
+            for(int i = 0;i<length;i++){
+                bs2[i]=bs[length-i-1];
+            }
+            serializer.writeBytes(bs2);
+        }else {
+            throw new SQLException("Expected String|BigDecimal Parameter, but was " + data.getClass().getSimpleName());
         }
     }
 
@@ -144,4 +164,5 @@ public class DataTypeDecimal implements IDataType {
         }
         return 0;
     }
+
 }

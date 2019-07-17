@@ -84,4 +84,10 @@ public class ClickHousePreparedInsertStatement extends AbstractPreparedStatement
         }
         return param;
     }
+
+    @Override
+    public int getQueryTimeout() throws SQLException {
+
+        return connection.getNetworkTimeout();
+    }
 }

@@ -113,7 +113,10 @@ public class BinarySerializer {
     }
 
     public void writeStringViewBinary(StringView data) throws IOException, SQLException {
-        writeVarInt(data.end() - data.start());
-        container.get().writeBinary(StringViewCoding.bytes(data));
+
+        //中文有问题
+        byte[] bytes = StringViewCoding.bytes(data);
+        writeVarInt(bytes.length);
+        container.get().writeBinary(bytes);
     }
 }

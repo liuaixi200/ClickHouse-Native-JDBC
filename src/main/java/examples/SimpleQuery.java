@@ -11,13 +11,24 @@ public class SimpleQuery {
 
   public static void main(String[] args) throws Exception {
     Class.forName("com.github.housepower.jdbc.ClickHouseDriver");
-    Connection connection = DriverManager.getConnection("jdbc:clickhouse://127.0.0.1:9000");
+    while(true){
+        try {
+            Thread.sleep(1000);
+            //Connection connection = DriverManager.getConnection("jdbc:clickhouse://10.0.73.20:9000,10.0.73.20:9001/vsfc");
+            Connection connection = DriverManager.getConnection("jdbc:clickhouse://10.0.73.20:9000,10.0.73.20:9001/vsfc","default","A123456a");
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from sett_info");
+            System.out.println(connection.getMetaData().getURL());
+            while (rs.next()) {
 
-    Statement stmt = connection.createStatement();
-    ResultSet rs = stmt.executeQuery("SELECT (number % 3 + 1) as n, sum(number) FROM numbers(10000000) GROUP BY n");
+                System.out.println(rs.getObject(1) + "\t" + rs.getObject(2));
+            }
 
-    while (rs.next()) {
-      System.out.println(rs.getInt(1) + "\t" + rs.getLong(2));
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
     }
+
   }
 }

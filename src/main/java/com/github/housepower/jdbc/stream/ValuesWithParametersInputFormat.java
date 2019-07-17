@@ -43,8 +43,10 @@ public class ValuesWithParametersInputFormat implements InputFormat {
                 lexer = new SQLLexer(pos, query);
                 nextChar = lexer.character();
             }
-
-            Validate.isTrue(nextChar == '(');
+            if (nextChar == ',') {
+                nextChar = lexer.character();
+            }
+            Validate.isTrue(nextChar == '(',lexer.getBeforeTenStr());
             for (int column = 0; column < header.columns(); column++) {
                 if (column > 0)
                     Validate.isTrue(lexer.character() == ',');

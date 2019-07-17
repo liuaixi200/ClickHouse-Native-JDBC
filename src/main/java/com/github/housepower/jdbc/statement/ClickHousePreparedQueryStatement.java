@@ -69,4 +69,10 @@ public class ClickHousePreparedQueryStatement extends AbstractPreparedStatement 
         queryParts.add(query.substring(lastPos, query.length()));
         return queryParts.toArray(new String[queryParts.size()]);
     }
+
+    @Override
+    public int getQueryTimeout() throws SQLException {
+
+        return connection.getNetworkTimeout();
+    }
 }

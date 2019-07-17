@@ -43,7 +43,11 @@ public class DataTypeString implements IDataType {
             serializer.writeStringBinary((String) data);
         } else if (data instanceof StringView) {
             serializer.writeStringViewBinary((StringView) data);
-        } else {
+        } else if(null == data){
+            //null 转成空字符串，暂时无法拿到默认值
+            serializer.writeStringBinary("");
+        }
+        else {
             throw new SQLException("Expected String Parameter, but was " + data.getClass().getSimpleName());
         }
     }

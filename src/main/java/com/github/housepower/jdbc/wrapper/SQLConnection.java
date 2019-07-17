@@ -7,6 +7,8 @@ import java.util.concurrent.Executor;
 
 public abstract class SQLConnection implements Connection {
 
+    protected String cataLog = "clickhouse";
+
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
         throw new SQLClientInfoException();
@@ -80,12 +82,12 @@ public abstract class SQLConnection implements Connection {
 
     @Override
     public void setCatalog(String catalog) throws SQLException {
-        throw new SQLFeatureNotSupportedException();
+        this.cataLog = catalog;
     }
 
     @Override
     public String getCatalog() throws SQLException {
-        throw new SQLFeatureNotSupportedException();
+        return this.cataLog;
     }
 
     @Override

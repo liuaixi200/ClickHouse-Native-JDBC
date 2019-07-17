@@ -91,7 +91,8 @@ public abstract class SQLStatement implements Statement, PreparedStatement {
 
     @Override
     public int getUpdateCount() throws SQLException {
-        throw new SQLFeatureNotSupportedException();
+        //throw new SQLFeatureNotSupportedException();
+        return 0;
     }
 
     @Override
@@ -106,6 +107,7 @@ public abstract class SQLStatement implements Statement, PreparedStatement {
 
     @Override
     public int getFetchDirection() throws SQLException {
+
         throw new SQLFeatureNotSupportedException();
     }
 

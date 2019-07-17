@@ -69,7 +69,7 @@ public class SQLLexer {
 
     public StringView stringLiteral() throws SQLException {
         skipAnyWhitespace();
-        Validate.isTrue(isCharacter('\''));
+        Validate.isTrue(isCharacter('\''),getBeforeTenStr());
         return stringLiteralWithQuoted('\'');
     }
 
@@ -124,7 +124,7 @@ public class SQLLexer {
 
     private StringView stringLiteralWithQuoted(char quoted) throws SQLException {
         int start = pos;
-        Validate.isTrue(data[pos] == quoted);
+        Validate.isTrue(data[pos] == quoted,getBeforeTenStr());
         for (pos++; pos < data.length; pos++) {
             if (data[pos] == '\\')
                 pos++;
@@ -136,5 +136,18 @@ public class SQLLexer {
 
     public String toString(){
         return new String(data);
+    }
+
+    public String getBeforeTenStr(){
+        int beforeLength = 10;
+        int start = pos-beforeLength;
+        if(start<0){
+            start = 0;
+        }
+        int sumLength = beforeLength+10;
+        if(sumLength > data.length-start){
+            sumLength =data.length-start;
+        }
+        return new String(data,start,sumLength);
     }
 }

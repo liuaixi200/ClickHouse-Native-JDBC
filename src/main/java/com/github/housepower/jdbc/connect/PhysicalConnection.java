@@ -119,17 +119,25 @@ public class PhysicalConnection {
     }
 
     public static PhysicalConnection openPhysicalConnection(ClickHouseConfig configure) throws SQLException {
+        ClickHouseConfig.HostInfo[] hostInfos = configure.getHostInfos();
+        int goodindex = configure.getGoodIndex();
+        ClickHouseConfig.HostInfo hostInfo = hostInfos[goodindex];
         try {
-            SocketAddress endpoint = new InetSocketAddress(configure.address(), configure.port());
+            SocketAddress endpoint = new InetSocketAddress(hostInfo.getAddress(), hostInfo.getPort());
 
             Socket socket = new Socket();
             socket.setTcpNoDelay(true);
             socket.setSendBufferSize(ClickHouseDefines.DEFAULT_BUFFER_SIZE);
             socket.setReceiveBufferSize(ClickHouseDefines.DEFAULT_BUFFER_SIZE);
             socket.connect(endpoint, configure.connectTimeout());
-
             return new PhysicalConnection(socket, new BinarySerializer(socket), new BinaryDeserializer(socket));
         } catch (IOException ex) {
+            //重连
+            goodindex++;
+            if(goodindex < hostInfos.length){
+                configure.setGoodIndex(goodindex);
+                return openPhysicalConnection(configure);
+            }
             throw new SQLException(ex.getMessage(), ex);
         }
     }

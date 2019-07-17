@@ -66,4 +66,10 @@ public class ClickHouseStatement extends SQLStatement {
     public ResultSetMetaData getMetaData() throws SQLException {
         return lastResultSet.getMetaData();
     }
+
+    @Override
+    public int getQueryTimeout() throws SQLException {
+
+        return connection.getNetworkTimeout();
+    }
 }

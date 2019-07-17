@@ -30,7 +30,12 @@ public class ClickHouseConfig {
 
     private Map<SettingKey, Object> settings;
 
+    private HostInfo[] hostInfos;
+
+    private int goodIndex;
+
     public static final Pattern DB_PATH_PATTERN = Pattern.compile("/([a-zA-Z0-9_]+)");
+
 
     private ClickHouseConfig() {
     }
@@ -98,7 +103,15 @@ public class ClickHouseConfig {
 
     private Map<SettingKey, Object> parseJDBCUrl(String jdbcUrl) throws SQLException {
         try {
-            URI uri = new URI(jdbcUrl.substring(5));
+            // 4  1    10    1 2
+            //jdbc:clickhouse://10.0.73.20:9000/vsfc?  //jdbc:clickhouse:10.0.73.20:9000,10.0.73.20:9001/vsfc?
+            String hostUrl = jdbcUrl.substring(18);//   //10.0.73.20:9000,10.0.73.20:9001/vsfc?
+            //逗号截取,是否有多个数据源
+            int endIndex = hostUrl.indexOf("/");
+            String hostContent = hostUrl.substring(0,endIndex); //  10.0.73.20:9000,10.0.73.20:9001
+            hostInfos = parse2HostInfo(hostContent);
+            String parseUrl = "clickhouse://"+hostInfos[0].getAddress()+":"+hostInfos[0].getPort()+hostUrl.substring(endIndex);
+            URI uri = new URI(parseUrl);
             Map<SettingKey, Object> settings = new HashMap<SettingKey, Object>();
 
             String database = uri.getPath();
@@ -155,5 +168,56 @@ public class ClickHouseConfig {
         configure.settings = new HashMap<SettingKey, Object>(this.settings);
 
         return configure;
+    }
+
+    public HostInfo[] getHostInfos() {
+        return hostInfos;
+    }
+
+    public int getGoodIndex() {
+        return goodIndex;
+    }
+
+    public void setGoodIndex(int goodIndex) {
+        this.goodIndex = goodIndex;
+        this.address = hostInfos[goodIndex].getAddress();
+        this.port = hostInfos[goodIndex].getPort();
+    }
+
+    private HostInfo[] parse2HostInfo(String url){
+        String[] strs = url.split(",");
+        HostInfo[] hss = new HostInfo[strs.length];
+        for(int i =0;i<strs.length;i++){
+            String ss = strs[i];
+            String[] hs = ss.split(":");
+            HostInfo hi = new HostInfo();
+            hi.setAddress(hs[0]);
+            hi.setPort(Integer.parseInt(hs[1]));
+            hss[i] = hi;
+        }
+        return hss;
+    }
+
+    public static class HostInfo{
+
+        private String address;
+
+        private int port;
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
     }
 }

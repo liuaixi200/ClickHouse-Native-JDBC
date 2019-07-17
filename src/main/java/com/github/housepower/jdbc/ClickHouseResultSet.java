@@ -11,12 +11,7 @@ import com.github.housepower.jdbc.wrapper.SQLResultSet;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Array;
-import java.sql.Date;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Calendar;
 import java.util.Iterator;
 
@@ -253,5 +248,10 @@ public class ClickHouseResultSet extends SQLResultSet {
             }
         }
         return new Block();
+    }
+
+    @Override
+    public int getType() throws SQLException {
+        return ResultSet.TYPE_FORWARD_ONLY;
     }
 }
